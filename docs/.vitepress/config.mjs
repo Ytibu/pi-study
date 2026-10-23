@@ -16,8 +16,8 @@ export default defineConfig({
 			{
 				name: "standalone-docs",
 				configResolved(config) {
-					// VitePress 默认追加上级 workspace，需在合并后收回到文档项目内。
-					config.server.fs.allow = [projectRoot];
+					// 合并后将范围收回到文档项目；Vite 的路径匹配要求使用正斜杠。
+					config.server.fs.allow = [projectRoot.replaceAll("\\", "/")];
 				},
 			},
 		],
