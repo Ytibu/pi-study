@@ -1,0 +1,8 @@
+node_modules/
+.vitepress/cache/
+.vitepress/dist/
+.vitepress/.temp/
+.env
+.env.*
+!.env.example
+*.log
