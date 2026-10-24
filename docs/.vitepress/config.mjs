@@ -28,6 +28,7 @@ export default defineConfig({
 			{ text: "项目启动", link: "/01-项目启动" },
 			{ text: "启动脚本", link: "/02-pi-test启动脚本" },
 			{ text: "Agent 基础", link: "/03-Agent基础与最小运行闭环" },
+			{ text: "上下文准备", link: "/04-消息历史与上下文准备" },
 		],
 		sidebar: [
 			{
@@ -37,6 +38,15 @@ export default defineConfig({
 					{ text: "01 项目启动", link: "/01-项目启动" },
 					{ text: "02 pi-test 启动脚本", link: "/02-pi-test启动脚本" },
 					{ text: "03 Agent 基础与最小运行闭环", link: "/03-Agent基础与最小运行闭环" },
+					{
+						text: "04 消息历史与上下文准备",
+						link: "/04-消息历史与上下文准备",
+						items: [
+							{ text: "04.1 历史消息", link: "/04-1-历史消息" },
+							{ text: "04.2 上下文", link: "/04-2-上下文" },
+							{ text: "04.3 工具说明", link: "/04-3-工具说明" },
+						],
+					},
 				],
 			},
 		],
