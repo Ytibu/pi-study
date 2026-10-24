@@ -26,6 +26,7 @@ export default defineConfig({
 		nav: [
 			{ text: "学习索引", link: "/" },
 			{ text: "项目启动", link: "/01-项目启动" },
+			{ text: "启动脚本", link: "/02-pi-test启动脚本" },
 		],
 		sidebar: [
 			{
@@ -33,6 +34,7 @@ export default defineConfig({
 				items: [
 					{ text: "学习索引", link: "/" },
 					{ text: "01 项目启动", link: "/01-项目启动" },
+					{ text: "02 pi-test 启动脚本", link: "/02-pi-test启动脚本" },
 				],
 			},
 		],
@@ -64,9 +66,9 @@ export default defineConfig({
 			const renderLink = md.renderer.rules.link_open;
 			md.renderer.rules.link_open = (tokens, index, options, env, renderer) => {
 				const href = tokens[index].attrGet("href");
-				// 仅在网页渲染时转换仓库外链，保留原始 Markdown。
-				if (href?.startsWith("../../")) {
-					tokens[index].attrSet("href", `https://github.com/earendil-works/pi/blob/v1.0.0/${href.slice(6)}`);
+				// 将子模块文件链接转换为对应版本的官方源码链接。
+				if (href?.startsWith("../../pi/")) {
+					tokens[index].attrSet("href", `https://github.com/earendil-works/pi/blob/v1.0.0/${href.slice(9)}`);
 				}
 				return renderLink(tokens, index, options, env, renderer);
 			};

@@ -1,50 +1,40 @@
 # Pi 学习文档站
 
-本目录是 `pi-study` 的核心文档项目，使用 VitePress 1.6.4 展示基于官方 Pi **v1.0.0** 的中文学习内容。官方源码位于同级的 `../pi/`，由根 Git 仓库以子模块锁定版本，详见 [项目说明](../README.md)。
+基于 Pi **v1.0.0** 的中文源码学习文档，使用 VitePress 1.6.4。项目结构与源码版本见 [项目说明](../README.md)，正文从 [学习索引](learning/README.md) 开始。
 
-学习内容依赖固定版本的 Pi；文档站使用自己的 npm 依赖、锁文件和工具配置，不加入 Pi 的 npm workspaces，也不调用 Pi 的构建脚本。
+## 启动与构建
 
-## 本地运行
-
-所有命令均在本项目目录执行：
+使用已有的 Node.js ≥22.0.0 和 npm，从项目根目录执行：
 
 ```powershell
-cd E:\codeSpace\pi-study\docs
-
-# 首次安装本项目锁定的依赖
-npm ci --ignore-scripts
-
-# 启动开发服务器
+cd docs
+npm ci --ignore-scripts  # 首次安装
 npm run dev
 ```
 
-打开终端输出的地址，通常为 `http://127.0.0.1:5173/`。端口占用时以实际输出为准。
-
-## 构建与预览
+打开终端输出的地址。在 `docs/` 中执行以下命令构建并预览：
 
 ```powershell
 npm run build
 npm run preview
 ```
 
-静态产物位于本项目的 `.vitepress/dist/`；`node_modules/`、缓存和构建产物由本项目自己的 `.gitignore` 忽略。
+构建产物位于 `docs/.vitepress/dist/`。文档站只使用 `docs/` 的依赖与配置，无需安装或构建 `pi/` 中的 npm 包。
 
-## 源码依赖与构建边界
+## 内容与维护
 
-- `package.json`、`package-lock.json`：只管理文档站依赖，不使用 `workspace:`、`file:` 或 Pi 包引用。
-- `.npmrc`：本项目的 npm 配置，明确禁用 workspace 模式；仍遵循宿主机正常的用户级 npm 设置。
-- `tsconfig.json`、`.vitepress/config.mjs`：本项目自己的工具配置，不继承 Pi 配置。
-- 使用宿主机 Node.js ≥22.0.0 和 npm；只构建文档站无需安装 Pi 的运行依赖。
-- 学习文档中的源码引用在渲染时转为公开 GitHub 链接，不读取文档项目外的文件。
+| 项目路径 | 用途 |
+| --- | --- |
+| `docs/learning/README.md` | 学习索引，渲染为站点首页 |
+| `docs/learning/01-项目启动.md` | 启动步骤、源码入口与验证记录 |
+| `docs/learning/02-pi-test启动脚本.md` | Linux/macOS 与 Windows 启动脚本解析 |
+| `docs/.vitepress/config.mjs` | 导航、侧边栏、中文搜索和源码链接转换 |
+| `pi/` | 固定在 v1.0.0 的官方源码子模块 |
 
-源码阅读和行为核验以根仓库锁定的 `pi/` 为准。历史学习笔记保留当时的旧路径和执行记录，当前源码位置是 `E:\codeSpace\pi-study\pi`。Pi 与文档站是同级目录。
+新增笔记时：
 
-## 添加学习文档
+1. 在 `docs/learning/` 按 `02-主题.md`、`03-主题.md` 命名，注明版本、日期和验证范围。
+2. 更新学习索引及 `.vitepress/config.mjs` 的侧边栏。
+3. 在 `docs/` 执行 `npm run build`；涉及导航或渲染时，再通过预览检查页面。
 
-1. 在本项目的 `learning/` 新增 Markdown，并更新原学习索引。
-2. 在 `.vitepress/config.mjs` 的 `themeConfig.sidebar` 中添加入口。
-3. 在本项目目录运行 `npm run build` 检查页面生成与站内链接。
-
-原学习索引 `learning/README.md` 通过路由重写作为首页。正文指向仓库文件的 `../../` 相对链接仅在渲染时转换为 GitHub `v1.0.0` 源码链接；原文不改写。本地搜索使用中文分词。
-
-配置方式参考 [VitePress 1.6.4 官方文档](https://vuejs.github.io/vitepress/v1/guide/routing)。
+正文中的源码链接使用相对于笔记的路径，如 `../../pi/package.json`。站点渲染时将其转换为官方 GitHub 的 `v1.0.0` 链接，仓库内阅读时则直接定位 `pi/` 子模块文件。
