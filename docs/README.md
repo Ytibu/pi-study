@@ -28,6 +28,7 @@ npm run preview
 | `docs/learning/README.md` | 学习索引，渲染为站点首页 |
 | `docs/learning/01-项目启动.md` | 启动步骤、源码入口与验证记录 |
 | `docs/learning/02-pi-test启动脚本.md` | Linux/macOS 与 Windows 启动脚本解析 |
+| `docs/learning/03-Agent基础与最小运行闭环.md` | Agent 概念、模型与工具循环、消息流转及源码入口 |
 | `docs/.vitepress/config.mjs` | 导航、侧边栏、中文搜索和源码链接转换 |
 | `pi/` | 固定在 v1.0.0 的官方源码子模块 |
 
