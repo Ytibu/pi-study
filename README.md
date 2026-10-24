@@ -54,6 +54,6 @@ npm run dev
 
 在 `docs/` 执行 `npm run build`，产物位于 `.vitepress/dist/`；执行 `npm run preview` 预览。新增笔记后同步更新 [学习索引](docs/learning/README.md) 与 `docs/.vitepress/config.mjs` 中的侧边栏。
 
-需要实际运行 Pi 时，进入 `pi/` 阅读上游说明；Pi 要求 Node.js ≥22.19.0，其运行环境与验证结论应单独记录。历史笔记中的旧路径和命令表示当时的执行环境，当前源码位置是本项目的 `pi/`。
+需要实际运行 Pi 时，进入 `pi/` 阅读上游说明；Pi 要求 Node.js ≥22.19.0，具体步骤见 [项目启动](docs/learning/01-项目启动.md)。文档中的目录均以项目根目录为起点，命令另行注明工作目录。
 
 贡献要求见 [AGENTS.md](AGENTS.md)，文档站使用说明见 [docs/README.md](docs/README.md)。
