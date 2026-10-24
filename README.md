@@ -56,4 +56,27 @@ npm run dev
 
 需要实际运行 Pi 时，进入 `pi/` 阅读上游说明；Pi 要求 Node.js ≥22.19.0，具体步骤见 [项目启动](docs/learning/01-项目启动.md)。文档中的目录均以项目根目录为起点，命令另行注明工作目录。
 
-贡献要求见 [AGENTS.md](AGENTS.md)，文档站使用说明见 [docs/README.md](docs/README.md)。
+## Git 工作流
+
+每项任务从 `main` 创建独立工作分支，过程中的小步提交全部留在该分支。完成验证后主动 squash 合并，让 `main` 每项任务只保留一个成果提交。
+
+```powershell
+# 开始任务：确认工作区干净，再创建分支
+git switch main
+git switch -c docs/topic-name
+
+# 开发过程中按明确路径暂存并多次提交
+git add -- <本次修改的文件>
+git commit -m "docs: 描述本步改动"
+
+# 完成适用检查并审阅全部任务差异后整合
+git diff main...HEAD
+git switch main
+git merge --squash docs/topic-name
+git commit -m "docs: 描述完整任务成果"
+git status --short
+```
+
+工作分支保留完整小步历史；后续任务另开分支。禁止直接在 `main` 开发，也不通过普通 merge 或 fast-forward 把过程提交带入主干。历史重写与远程推送另行明确处理。
+
+完整贡献要求见 [AGENTS.md](AGENTS.md)，文档站使用说明见 [docs/README.md](docs/README.md)。
