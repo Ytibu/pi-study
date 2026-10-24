@@ -1,10 +1,14 @@
 # 02 pi-test 启动脚本
 
-版本：Pi **v1.0.0**（`a13d35a74`） · 记录日期：2026-10-24
+版本：Pi **v1.0.0**（`a13d35a74`） · 记录日期：2026-10-24 · 修订日期：2026-10-25
 
-`pi-test` 是从源码启动 Pi 的包装脚本。它负责找到源码、处理包装层参数、预加载源码解析器，再把控制权交给 CLI；脚本本身不执行测试套件，也不安装依赖或补齐模型数据。环境准备见 [01 项目启动](01-项目启动.md)。
+**`pi-test` 脚本完成一件事：把终端中的启动命令交给 Node.js，让它直接运行 Pi 的 CLI 源码。** 本模块解释三个脚本各自如何完成这项工作：
 
-本篇分别解析 Linux/macOS 的 [pi-test.sh](../../pi/pi-test.sh) 和 Windows 的 [pi-test.ps1](../../pi/pi-test.ps1)，再说明 [pi-test.bat](../../pi/pi-test.bat) 如何转调 PowerShell。除源码片段中的相对路径外，文档路径以本项目根目录为起点。
+- **Linux/macOS `pi-test.sh`**：找到源码目录，处理 `--no-env` 和其余参数，预加载源码解析器，再运行实验 CLI 入口。
+- **Windows `pi-test.ps1`**：完成同样的启动准备，运行普通 CLI 入口，并传回失败退出码。
+- **Windows `pi-test.bat`**：从 CMD 调用 PowerShell 执行 `pi-test.ps1`，再传回退出码。
+
+下面先看调用关系，再分别拆解脚本，最后解释源码解析器与 CLI 入口差异。依赖安装和模型数据准备见 [01 项目启动](01-项目启动.md)。
 
 ## 1. 先看调用关系
 
@@ -28,7 +32,11 @@ pi/
 
 ## 2. Linux/macOS：pi-test.sh
 
+这个脚本将 Bash 收到的参数交给 Node.js：按需清理环境变量，先加载 `source-resolver.ts`，再执行 `src/experimental/cli.ts`，最后以 Node.js 的退出状态结束。源码见 [pi-test.sh](../../pi/pi-test.sh)。
+
 ### 2.1 选择 Bash 并启用错误检查
+
+这一步指定脚本使用 Bash，并为后续命令启用失败检查。
 
 ```bash
 #!/usr/bin/env bash
@@ -44,6 +52,8 @@ set -euo pipefail
 
 ### 2.2 找到脚本目录，不切换工作项目
 
+这一步得到 Pi 源码所在目录，供后续定位解析器和 CLI 文件，同时保留调用者的当前工作目录。
+
 ```bash
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ```
@@ -53,6 +63,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 这里的 `cd` 在命令替换的子 Shell 中执行，不改变外层脚本的当前目录。后续可以用绝对路径加载 Pi，同时保留用户选择的工作项目。引号用于保护路径中的空格。
 
 ### 2.3 消费 --no-env，保留其他参数
+
+这一步识别脚本自己处理的 `--no-env` 开关，将其移除，并把其余参数按原顺序留给 CLI。
 
 ```bash
 NO_ENV=false
@@ -80,6 +92,8 @@ done
 
 ### 2.4 生成解析器 URL，交给 Node.js
 
+这一步让 Node.js 先加载源码解析器，再执行实验 CLI 入口，并接收前面保留的参数。
+
 ```bash
 RESOLVER_URL="$(node -p 'require("node:url").pathToFileURL(process.argv[1]).href' "$SCRIPT_DIR/packages/coding-agent/src/experimental/source-resolver.ts")"
 node --import "$RESOLVER_URL" "$SCRIPT_DIR/packages/coding-agent/src/experimental/cli.ts" ${ARGS[@]+"${ARGS[@]}"}
@@ -99,7 +113,11 @@ node --import "$RESOLVER_URL" "$SCRIPT_DIR/packages/coding-agent/src/experimenta
 
 ## 3. Windows：pi-test.ps1
 
+这个脚本将 PowerShell 收到的参数交给 Node.js：按需清理环境变量，先加载 `source-resolver.ts`，再执行普通入口 `src/cli.ts`，并保留 Node.js 的失败退出码。源码见 [pi-test.ps1](../../pi/pi-test.ps1)。
+
 ### 3.1 错误策略与脚本目录
+
+这一步设置 PowerShell 错误处理方式，找到 Pi 源码目录，并建立保存 CLI 参数的列表。
 
 ```powershell
 $ErrorActionPreference = "Stop"
@@ -114,6 +132,8 @@ $forwardArgs = New-Object System.Collections.Generic.List[string]
 `$MyInvocation.MyCommand.Path` 取得当前脚本路径，`Split-Path -Parent` 得到 `pi/` 所在目录。这里没有 `Set-Location`，同样保留调用者的当前工作目录。`List[string]` 用于保存待转发参数。
 
 ### 3.2 参数过滤与环境清理
+
+这一步从输入参数中取出 `--no-env` 开关，按需清理指定环境变量，其余参数留给 CLI。
 
 ```powershell
 foreach ($arg in $args) {
@@ -149,6 +169,8 @@ pwsh -NoProfile -File .\pi\pi-test.ps1 --no-env --version
 
 ### 3.3 拼接路径与启动 Node.js
 
+这一步构造解析器与普通 CLI 的文件路径，调用 Node.js 加载源码，并转发保留的参数。
+
 ```powershell
 $resolverUrl = ([System.Uri](Join-Path $scriptDir "packages/coding-agent/src/experimental/source-resolver.ts")).AbsoluteUri
 $cliPath = Join-Path $scriptDir "packages/coding-agent/src/cli.ts"
@@ -163,6 +185,8 @@ $cliPath = Join-Path $scriptDir "packages/coding-agent/src/cli.ts"
 
 ### 3.4 保留 Node.js 的失败退出码
 
+这一步把 Node.js 的失败状态传给上层调用者，使终端或自动化程序能够判断启动是否成功。
+
 ```powershell
 $exitCode = $LASTEXITCODE
 if ($exitCode -ne 0) {
@@ -174,7 +198,7 @@ if ($exitCode -ne 0) {
 
 ## 4. Windows CMD：pi-test.bat
 
-`.bat` 只负责找到 Windows PowerShell、调用 `.ps1` 并传回退出码，源码加载仍由 `.ps1` 完成。
+这个脚本让 CMD 用户也能启动同一份 Pi 源码：找到 Windows PowerShell，调用 `pi-test.ps1`，再传回退出码。源码加载由 `.ps1` 完成。源码见 [pi-test.bat](../../pi/pi-test.bat)。
 
 | 代码 | 作用 |
 | --- | --- |
