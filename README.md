@@ -58,25 +58,22 @@ npm run dev
 
 ## Git 工作流
 
-每项任务从 `main` 创建独立工作分支，过程中的小步提交全部留在该分支。完成验证后主动 squash 合并，让 `main` 每项任务只保留一个成果提交。
+日常修改、验证和小步提交统一在 `develop` 进行。`main` 由管理人员维护；需要整合时，通过 `develop` → `main` 的 Pull Request，由管理人员在托管平台手动执行 **Squash and merge**。
 
 ```powershell
-# 开始任务：确认工作区干净，再创建分支
-git switch main
-git switch -c docs/topic-name
+# 开始任务：检查工作区并确认开发分支
+git status --short
+git switch develop
 
 # 开发过程中按明确路径暂存并多次提交
 git add -- <本次修改的文件>
 git commit -m "docs: 描述本步改动"
 
-# 完成适用检查并审阅全部任务差异后整合
+# 完成适用检查并审阅差异，停留在 develop
 git diff main...HEAD
-git switch main
-git merge --squash docs/topic-name
-git commit -m "docs: 描述完整任务成果"
 git status --short
 ```
 
-工作分支保留完整小步历史；后续任务另开分支。禁止直接在 `main` 开发，也不通过普通 merge 或 fast-forward 把过程提交带入主干。历史重写与远程推送另行明确处理。
+`develop` 保留完整的小步提交历史，不再为每项任务另开分支。代理不操作 `main` 的提交、合并、推送或历史，即使当前操作者就是管理人员，也不代为执行主干合并。远程推送与创建 PR 按用户要求执行。
 
 完整贡献要求见 [AGENTS.md](AGENTS.md)，文档站使用说明见 [docs/README.md](docs/README.md)。
