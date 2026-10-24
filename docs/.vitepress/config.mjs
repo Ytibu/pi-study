@@ -26,6 +26,7 @@ export default defineConfig({
 		nav: [
 			{ text: "学习索引", link: "/" },
 			{ text: "项目启动", link: "/01-项目启动" },
+			{ text: "启动脚本", link: "/02-pi-test启动脚本" },
 		],
 		sidebar: [
 			{
@@ -33,6 +34,7 @@ export default defineConfig({
 				items: [
 					{ text: "学习索引", link: "/" },
 					{ text: "01 项目启动", link: "/01-项目启动" },
+					{ text: "02 pi-test 启动脚本", link: "/02-pi-test启动脚本" },
 				],
 			},
 		],
